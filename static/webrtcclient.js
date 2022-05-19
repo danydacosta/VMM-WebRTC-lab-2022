@@ -35,18 +35,19 @@ async function call() {
 // Then show it on localVideo.
 async function enable_camera() {
 
-    // *** TODO ***: define constraints: set video to true, audio to true
-    const constraints = { video: true, audio: true }
+    //Done: define constraints: set video to true, audio to true
+    const constraints = { video: true, audio: false };
 
-    // *** TODO ***: uncomment the following log message
+    //Done: uncomment the following log message
     console.log('Getting user media with constraints', constraints);
 
-    // *** TODO ***: use getUserMedia to get a local media stream from the camera.
+    //Done : use getUserMedia to get a local media stream from the camera.
     //               If this fails, use getDisplayMedia to get a screen sharing stream.
+
     try {
-        var stream = await navigator.mediaDevices.getUserMedia(constraints)
+        var stream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (error) {
-        
+        var stream = await navigator.mediaDevices.getDisplayMedia(constraints);
     }
 
     document.getElementById('localVideo').srcObject = stream;
@@ -60,9 +61,9 @@ async function enable_camera() {
 // --------------------------------------------------------------------------
 // Create a Socket.io connection with the Web server for signaling
 function create_signaling_connection() {
-    // *** TODO ***: create a socket by simply calling the io() function
+    // Done : create a socket by simply calling the io() function
     //               provided by the socket.io library (included in index.html).
-    // var socket = ...
+    var socket = io()
     return socket;
 }
 
@@ -75,6 +76,18 @@ function add_signaling_handlers(socket) {
     //               messages 'created', 'joined', 'full'.
     //               For all three messages, simply write a console log.
 
+    socket.on('created', (data) => {
+      console.log(data);
+    });
+
+    socket.on('joined', (data) => {
+      console.log(data);
+    });
+
+    socket.on('full', (data) => {
+      console.log(data);
+    });
+
 
     // Event handlers for call establishment signaling messages
     // --------------------------------------------------------
@@ -84,6 +97,26 @@ function add_signaling_handlers(socket) {
     // ok --> handle_ok
     // ice_candidate --> handle_remote_icecandidate
     // bye --> hangUp
+
+    socket.on('new_peer', (data, handle_new_peer) => {
+      handle_new_peer(data);
+    });
+
+    socket.on('invite', (data, handle_invite) => {
+      handle_invite(data);
+    });
+
+    socket.on('ok', (data, handle_ok) => {
+      handle_ok(data);
+    });
+
+    socket.on('ice_candidate', (data, handle_remote_icecandidate) => {
+      handle_remote_icecandidate(data);
+    });
+
+    socket.on('bye', (data, hangUp) => {
+      hangUp(data);
+    });
 
 }
 
